@@ -67,8 +67,9 @@ mod FASIW {
 
 trait ActionWith<'a> {
     fn draw(&self);
-    fn Aclick(&mut self, i32) -> i32;
+    fn click(&mut self, i32) -> i32;
     fn ChangeColor(&mut self, u8, u8, u8, u8, &PrimitivesAddon);
+    fn click_inside<T>(&self, T) -> bool;
 }
 
 #[derive(new)]
@@ -83,16 +84,23 @@ struct Button<'a> {
 }
 
 impl<'a> ActionWith<'a> for Button<'a> {
+
+	fn click_inside<T>(&self, obj: T) -> bool {
+	if FASIW::get_x() > self.x && 
+       FASIW::get_x() < self.w && 
+       FASIW::get_y() > self.y && 
+       FASIW::get_y() < self.h {
+       	true
+       } else { false }
+	}
+
     fn draw(&self) {
         self.q
             .draw_filled_rectangle(self.x, self.y, self.w, self.h, self.rgba);
     }
 
-    fn Aclick(&mut self, returN: i32) -> i32 {
-        if FASIW::get_x() > self.x && 
-           FASIW::get_x() < self.w && 
-           FASIW::get_y() > self.y && 
-        FASIW::get_y() < self.h
+    fn click(&mut self, returN: i32) -> i32 {
+        if self.click_inside(&self) == true
         {
             1
         } else {
@@ -120,17 +128,23 @@ struct CheckBox<'a> {
 }
 
 impl<'a> ActionWith<'a> for CheckBox<'a> {
+	fn click_inside<T>(&self, obj: T) -> bool {
+	if FASIW::get_x() > self.x && 
+       FASIW::get_x() < self.w && 
+       FASIW::get_y() > self.y && 
+       FASIW::get_y() < self.h {
+       	true
+       } else { false }
+	}
+
     fn draw(&self) {
         self.q
             .draw_filled_rectangle(self.x, self.y, self.w, self.h, self.rgba);
     }
 
-    fn Aclick(&mut self, returN: i32) -> i32 {
+    fn click(&mut self, returN: i32) -> i32 {
         unsafe {
-            if FASIW::get_x() > self.x && 
-               FASIW::get_x() < self.w && 
-               FASIW::get_y() > self.y && 
-            FASIW::get_y() < self.h
+            if self.click_inside(&self) == true
             {
                 self.checkbox_clicks = self.checkbox_clicks + 1;
                 if (self.checkbox_clicks % 2) == 0 {
@@ -187,24 +201,37 @@ struct InputText<'a> {
     moveindex: usize,
 }
 
-impl<'a> InputText<'a> {
+impl <'a>ActionWith<'a> for InputText<'a>  {
+
+	fn click_inside<T>(&self, obj: T) -> bool {
+	if FASIW::get_x() > self.x && 
+       FASIW::get_x() < self.w && 
+       FASIW::get_y() > self.y && 
+       FASIW::get_y() < self.h {
+       	true
+       } else { false }
+	}
+
     fn draw(&self) {
         self.q
             .draw_filled_rectangle(self.x, self.y, self.w, self.h, self.rgba[self.moveindex]);
     }
 
-    fn click(&mut self) {
+    fn click(&mut self, returN: i32) -> i32 {
         unsafe {
-            if FASIW::get_x() > self.x && 
-               FASIW::get_x() < self.w && 
-               FASIW::get_y() > self.y && 
-            FASIW::get_y() < self.h
+            if self.click_inside(&self) == true
             {
                 self.moveindex = 1;
+                return 1;
             } else {
                 self.moveindex = 0;
+                return 0;
             }
         }
+    }
+
+    fn ChangeColor(&mut self, r: u8 , g: u8, b: u8, a: u8, q: &PrimitivesAddon) {
+        self.rgba[1] = Color::from_rgba(r, g, b, a);
     }
 }
 
@@ -267,7 +294,7 @@ let mut ipt = InputText::new(10.0 , 10.0, 150.0 , 150.0,
         {
             DisplayClose{..} => break 'exit,
             TimerTick{..} => redraw = true,
-            MouseAxes{x, y , ..} => {x_mouse = (x) as f32;  y_mouse = (y) as f32;},
+            MouseAxes{x, y , ..} => {x_mouse = (x) as f32;  y_mouse = (y) as f32; if ipt.click_inside(&ipt) {println!("0");}},
             MouseButtonUp{x,y, ..} => {FASIW::change_mouse_status(1);  },
             MouseButtonDown{x,y, ..} => {
                 FASIW::click_for_numbers();
@@ -275,7 +302,7 @@ let mut ipt = InputText::new(10.0 , 10.0, 150.0 , 150.0,
                 FASIW::x_writter((x) as f32);
                 FASIW::y_writter((y) as f32);
 
-                ipt.click();
+                ipt.click(1);
 
                 },
             MouseLeaveDisplay{..} => {x_mouse = -100.0; y_mouse = 576.0;},
