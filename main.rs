@@ -14,7 +14,6 @@ use allegro_primitives::*;
 const CLICK: i32 = 1;
 
 mod FASIW {
-
     pub static mut x_mouse_click: f32 = -100.0;
     pub static mut y_mouse_click: f32 = -100.0;
     pub static mut mouse_status: i32 = 0;
@@ -68,7 +67,6 @@ mod FASIW {
 
 trait ActionWith<'a> {
     fn draw(&self);
-
     fn Aclick(&mut self, i32) -> i32;
     fn ChangeColor(&mut self, u8, u8, u8, u8, &PrimitivesAddon);
 }
@@ -90,14 +88,15 @@ impl<'a> ActionWith<'a> for Button<'a> {
             .draw_filled_rectangle(self.x, self.y, self.w, self.h, self.rgba);
     }
 
-    fn Aclick(&mut self, returN: i32) -> i32 {
+    fn Aclick(&mut self, returN: i32) -> i32 
+    {
         if FASIW::get_x() > self.x && FASIW::get_x() < self.w && FASIW::get_y() > self.y
-            && FASIW::get_y() < self.h
+        && FASIW::get_y() < self.h
         {
-            1
+        1
         } else {
-            2
-        }
+               2
+               }
     }
 
     fn ChangeColor(&mut self, r: u8, g: u8, b: u8, a: u8, q: &PrimitivesAddon) {
@@ -120,27 +119,27 @@ struct CheckBox<'a> {
 }
 
 impl<'a> ActionWith<'a> for CheckBox<'a> {
-
     fn draw(&self) {
         self.q
             .draw_filled_rectangle(self.x, self.y, self.w, self.h, self.rgba);
     }
 
-    fn Aclick(&mut self, returN: i32) -> i32 {
-        unsafe {
+    fn Aclick(&mut self, returN: i32) -> i32 
+    {
+      unsafe 
+      {
         if FASIW::get_x() > self.x && FASIW::get_x() < self.w && FASIW::get_y() > self.y
-            && FASIW::get_y() < self.h
+        && FASIW::get_y() < self.h
         {
-        	self.checkbox_clicks = self.checkbox_clicks + 1;
-                
-                if (self.checkbox_clicks % 2) == 0 {
-                   return 1
-                } else {
-                   return 2
-                }
+     self.checkbox_clicks = self.checkbox_clicks + 1;
+        if (self.checkbox_clicks % 2) == 0 {
+               return 1
+        } else {
+               return 2
+               }
         }
-		return 0;
-}
+        return 0;
+      }
     }
 
     fn ChangeColor(&mut self, r: u8, g: u8, b: u8, a: u8, q: &PrimitivesAddon) {
@@ -160,7 +159,6 @@ struct Texter<'a> {
 }
 
 impl <'a>Texter<'a> {
-
 	fn draw (&mut self, ff: &Font) {
 		self.core.draw_text(&ff ,self.rgba, self.x,self.y, FontAlign::Centre, &self.text);
 	}
@@ -182,31 +180,24 @@ moveindex: usize,
 }
 
 impl <'a>InputText<'a> {
-
-
-
 	fn draw(&self) {
 		self.q.draw_filled_rectangle(self.x, self.y, self.w, self.h, self.rgba[self.moveindex]);
 	}
 
-	fn click(&mut self) {
-	  unsafe {
+   fn click(&mut self) 
+   {
+      unsafe 
+      {
         if FASIW::get_x() > self.x && FASIW::get_x() < self.w && FASIW::get_y() > self.y
             && FASIW::get_y() < self.h
         {
-        	self.moveindex = 1;
+        self.moveindex = 1;
         } else { 
         	self.moveindex = 0;
-        }
+       	       }
       }
-	 }	
-
-	 fn focus()
-	 {
-
-	 }
+   }	
 }
-
 
 allegro_main!
 {
